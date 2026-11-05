@@ -1,29 +1,142 @@
 # EMPLOYEE-ATTRITION-ANALYSIS-2026
 
 ## PROJECT OVERVIEW
-This project explains why 895 of 5,000 employees (17.9%) left the workforce in 2026, using a SQL Server source table and a five-page Power BI dashboard.
-The analysis starts from a single employee-level table of 42 fields covering demographics, job and pay, tenure, workload, engagement scores and the attrition outcome. Data is shaped in Power Query, modelled with DAX measures, and delivered as an interactive report (Employee_Attrition_WIP.pbix) that HR and business leaders can filter by department, work mode, gender, education and workload bands.
+This project analyses why employees leave a 5,000-person organisation, and shows that 17.9% (895 employees) attrited, with burnout, overtime, weak manager support and poor work-life balance as the strongest warning signs. The exploratory analysis was done in SQL Server and the findings were turned into a five-page, interactive Power BI dashboard for HR leaders.
 
-## OBJECTIVES
-• Measure attrition overall and by department, job role, job level, gender and work mode.
-• Identify which working conditions (burnout, overtime, work-life balance, manager support, commute) are linked to leaving.
-• Test whether pay, salary hikes, stock options and promotion timing are linked to leaving.
-• Take a closer look at Customer Support, the department with the highest attrition rate.
+The work follows a standard analytics pipeline:
+
+- Clean the HR table and engineer banded (categorical) features in SQL Server.
+- Run a structured exploratory analysis of attrition rate by every demographic, job, compensation and wellbeing dimension.
+- Import the prepared table into Power BI, apply a set of corrections, and build a DAX measure layer.
+- Publish findings across five report pages: Workforce Overview, Attrition Driver, Attrition Hotspot, Compensation and Career Growth, and a Customer Support Deep Dive.
+
+|HEADLINE METRIC                            |VALUE                                                               |
+|-------------------------------------------|--------------------------------------------------------------------|
+|Total Employees                            |5000                                                                |
+|Retained                                   |4,105 (82.1%)                                                       |
+|Attrited                                   |895 (17.9%)                                                         |
+|Highest-attrition department               |Customer Support (24.1%)                                            |
+|Average monthly income                     |6,991                                                               |
 
 ## BUSINESS PROBLEMS
-Losing almost one in five employees is costly, and leadership needs to know where it happens, why, and what to fix first. The dashboard is built to answer six questions, one per page or panel:
-• How big is the problem? Total workforce, retained and attrited headcount, and attrition and retention rates.
-• Where is attrition concentrated? Which departments, job roles, job levels, genders and work modes lose the most people.
-• What working conditions push people out? Burnout, work-life balance, weekly overtime, commute time and manager support.
-• Is pay or career growth a factor? Salary hike percentage, stock option level, years since promotion, and the income gap between leavers and stayers.
-• What is happening in Customer Support? Why the department with the highest attrition rate loses people, and which workload factor matters most there.
-• Where should HR act first? Which segments combine a high rate with enough headcount to matter.
+Almost one in five employees leaves, and the organisation cannot yet say who is at risk, why, or where to intervene first. Replacing staff is costly in recruitment, onboarding and lost productivity, and attrition is far from evenly spread. HR leadership needs answers to five questions:
+- How big is the problem? What are the overall retention and attrition rates, and which departments, roles and job levels carry the highest rates?
+- Who is leaving? Do age, gender, marital status, education, tenure or work mode separate leavers from stayers?
+- Why are they leaving? Which workload and wellbeing factors (burnout, overtime, work-life balance, manager support, commute) are most associated with exits?
+- Is pay or career growth a factor? Do salary hikes, stock options, income and time since promotion differ between leavers and stayers?
+- Where should HR act first? The Customer Support department has the highest attrition, so what is driving it there?
+
+## OBJECTIVES
+The project set out to turn the raw Employee attrition table into evidence HR can act on. Each objective maps to a business problem above.
+- Baseline: quantify total employees, retention count and rate, and attrition count and rate.
+- Profile: measure attrition by age, gender, marital status, education, department, job role, job level, work mode and tenure.
+- Drivers: test the link between attrition and burnout, overtime, work-life balance, manager support and commute.
+- Reward and growth: measure attrition by salary hike, stock option level and years since promotion, and compare leaver and stayer income by job level.
+- Hotspot: isolate Customer Support and identify which factors push its attrition above the company average.
+- Prepare: engineer clean, ordered, human-readable categories so results can be compared across dimensions.
+- Model: build reusable DAX measures so every KPI, chart and "highest category" callout updates with the slicers.
+- Communicate: deliver a consistent, filterable five-page dashboard and a written report with recommendations.
 
 ## DATASETS
-The project uses one table, employee_attrition_hr_2026, held in the employee_attrition SQL Server database (schema dbo). It has 5,000 rows, one per employee, with a unique employee_id and no missing values. The outcome field attrition splits the workforce into 4,105 Retained and 895 Attrited employees.
+The analysis uses a single table, employee_attrition_hr_2026, with one row per employee (5,000 unique employee_id values, no missing values) and 29 source columns. The target variable is attrition (0 = retained, 1 = attrited in the SQL layer). The dataset contains 8 departments, 25 job roles, 5 job levels, and three work modes (Onsite 1,742, Hybrid 2,237, Remote 1,021).
 
+|GROUP                                    |COLUMNS                                                                          |
+|-----------------------------------------|---------------------------------------------------------------------------------|
+|Identity and demographics                |employee_id, age (21 to 64), gender, marital_status, education_level             |
+|Role and structure                       |department, job_role, job_level, work_mode                                       |
+|Compensation and reward                  |monthly_income, stock_option_level, salary_hike_pct (0 to 22.6)                  |
+|Tenure and career                        |years_at_company, total_working_years,years_since_promotion,num_prior_companies,|  performance_rating, last_review_score|
+|Workload                                 |overtime_hours_per_week (0 to 34.9), commute_minutes (0 to 92),business_travel_days_per_year, training_hours |
+|Wellbeing and sentiment (1 to 10 scales) |manager_support_score, burnout_score, engagement_score, work_life_balance_score  |
+|AI exposure                              |uses_ai_tools_at_work, perceived_ai_job_risk                                     |
+|Target                                   |attrition                                                                       | 
 
------------------------|---------------------------------------------------------------------------------------------|
-FSGSFSHSKK
+The Power BI version of the table holds 42 columns: the 29 source columns, 7 SQL-derived banded columns, 4 banded score columns re-created in Power BI (manager support, burnout, engagement, work-life balance), and 2 sort-helper columns.
 
+## TOOLS AND TECHNOLOGIES
+|TOOL                                    |USED FOR                                                                          |
+|----------------------------------------|----------------------------------------------------------------------------------|
+|Microsoft SQL Server                    |Database creation, type conversion, CASE-based feature engineering, aggregate EDA queries |
+|Power BI Desktop                        |Data model, report pages, slicers, cards, charts, navigation buttons             |
+|DAX                                     |Measures (counts, rates, ranking labels), calculated columns for sort order      |
+|Power BI data load and transform        |Import of the SQL table and the corrections described in data preparation        |
 
+Key SQL server techniques: ALTER TABLE ... ALTER COLUMN, UPDATE ... SET ... CASE, conditional counting with COUNT(CASE WHEN ...), CAST ... AS FLOAT for safe division, and GROUP BY ... ORDER BY for ranked output. Key DAX techniques: CALCULATE, DIVIDE, ADDCOLUMNS, TOPN, CONCATENATEX, MAXX, VALUES, SWITCH(TRUE()), and variables (VAR).
+
+## DATA PREPARATION
+Preparation happened in two stages: feature engineering in SQL Server, then a set of corrections when the table was exported to Power BI. The corrections matter because they change how several categories read and sort in the final dashboard.
+
+###  SQL Server preparation
+- Database and table. A database employee_attrition was created and the table employee_attrition_hr_2026 inspected with SELECT *.
+- Precision control. Eleven numeric columns (salary_hike_pct, years_at_company, total_working_years, years_since_promotion, overtime_hours_per_week, manager_support_score, burnout_score, engagement_score, work_life_balance_score, last_review_score, perceived_ai_job_risk) were converted to DECIMAL(10,1) so every value carries one decimal place.
+- Banded features. Eleven categorical columns were added with ALTER TABLE ... ADD and populated with UPDATE ... CASE, turning continuous measures into groups that can be compared:
+
+|NEW COLUMN                        |BAND RULE                                                                               |
+|----------------------------------|----------------------------------------------------------------------------------------|
+|stock_option_level_category       |0 = No stock option, 1 = Low, 2 = Medium, 3 = High                                      |
+|salary_hike_pct_category          |up to 7.5 Low, up to 15 Medium, up to 22.6 High                                         |
+|weekly_overtime_category          |up to 10 hrs Low, up to 20 Moderate, above 20 High                                      |
+|years_since_promotion_category    |up to 4 Recently Promoted, up to 8 Due, above 8 Overdue                                 |
+|age_category                      |21-35, 36-50, 50-64                                                                     |
+|years_at_company_category         |up to 5, up to 10, up to 15, above 15                                                   |
+|num_prior_companies_category      |up to 2, up to 4, up to 6, above 6                                                      |
+|commute_minutes_category / manager_support / burnout|       |up to 20, 21-40, 41-60, 61-80, above 80 |
+|work_life_balance_score_category|up to 3, up to 7, above 7 (scored 1 to 10) | 
+
+ ### Corrections applied on export to Power BI
+The table in the Power BI model differs from the SQL output in the following ways. Each change fixes an ambiguity in the SQL labels or makes the dashboard easier to read.
+
+|FIELD                        |IN SQL                               |CORRECTION IN POWER BI                                 |
+|-----------------------------|-------------------------------------|-------------------------------------------------------|
+|attrition                    |0/1                                  |Text values "Retained" / "Attrited"                    |
+|years_at_company_category    |0-5, 5-10, 10-15, 15-20              |0-5, 6-10, 11-15, 16-20                                |
+|Sort order                   |Alphabetical by label                |Helper columns Commute Minutes Category Sort and Stock   Option Level Sort|
+
+## EXPLORATORY DATA ANALYSIS
+The EDA used one repeated query pattern: count employees, count attrition with COUNT(CASE WHEN attrition = 1 ...), and compute the rate as attrition divided by headcount, ordered from highest to lowest rate. Running the same pattern across every dimension makes the results directly comparable.
+
+### Query structure
+- Baseline: Total employees, retained and attrited counts, and retention and attrition rates.
+- Company-wide profile: Age, gender, marital status, education, department, job role, job level, work mode, tenure, prior companies and performance rating.
+- Driver analysis: Burnout, work-life balance, manager support, commute and weekly overtime categories, plus salary hike, stock options and years since promotion.
+- Customer Support drill-down: The same driver queries repeated with WHERE department = 'Customer Support', together with department-level income and AI-tool usage cuts.
+
+  ### Attrition rate by dimension (highest and lowest group)
+  |DIMENTION                            |HIGHEST ATTRITION                        |LOWEST ATTRITION                         |
+  |-------------------------------------|-----------------------------------------|-----------------------------------------|
+  |Burnout band                         |High, 54.0% (161 employees)              |Low, 4.6% (1,356 employees)              |
+  |Work-life balance band               |Poor, 52.7% (74 employees)               |High, 9.8% (1,177 employees)             |
+  |Weekly overtime                      |High (over 20 hrs), 52.4% (63 employees) |Low (up to 10 hrs),14.9% (4,017 employees|
+  |Manager support band                 |Low, 43.8% (160 employees)               |High, 10.1% (2,117 employees)            |
+  |Salary hike                          |Low (up to 7.5%), 28.5% (621 employees)  |High, 11.4% (753 employees)              |
+  |Years since promotion                |Overdue (over 8 yrs),33.3% (33 employees)|Recently promoted,16.8% (4,460 employees)|
+  |Department                           |Customer Support, 24.1% (636 employees)  |Engineering, 14.5% (1,336 employees)     |
+  |Work mode                            |Onsite, 21.2% (1,742 employees)          |Remote, 14.7% (1,021 employees)          |
+  |Commute                              |61-80 min, 21.2% (273 employees)         |0-20 min, 15.4% (1,549 employees)        |
+  |Stock options                        |None, 19.8% (1,528 employees)            |High, 16.7% (460 employees)              |
+  |Gender                               |Female, 18.2% (2,310 employees)          |Non-binary, 13.0% (100 employees)        |
+
+  ## DATA MODELLING AND DAX
+  The model is a single flat fact table, employee_attrition_hr_2026, plus a dedicated measures table, Measures (2). With one  row per employee and every attribute on that row, no relationships or dimension tables are needed, and every slicer filters  every visual on its page directly.
+
+  ###  Measure library
+  |CATEGORY                       |MEASURES                                                                                 |
+  |-------------------------------|-----------------------------------------------------------------------------------------|
+  |Core KPIs                      |Total Employee, Total Attrited, Total Retained, Attrited Rate, Retained %, Avg Monthly       Income, Average Age |                                                                                                     
+  |Highest callouts               |Highest Department by Attrition Rate, Highest Job Role by Attrition Rate, Highest Work       Mode by Attrition Rate, Highest Attrition Rate by Salary Hike PCT, Highest Attrition Rate by Years Since Promotion |      
+  |Compensation comparison        |AVG Income Leavers, AVG Income Stayers, Income Gap, Income Gap %                         |
+  |Customer Support               |Customer Support Employee Count, Attrition, Attrition Rate, Retention Count, Retention       Rate, Top Customer Support Attrition Driver |                                                                               
+
+  Two calculated columns, Commute Minutes Category Sort and Stock Option Level Sort, use SWITCH(TRUE()) to give bands a logical display order.
+
+  ## DASHBOARD DEVELOPMENT
+  The dashboard has five pages that move from "how big is the problem" to "why" to "where" to "what about pay and growth" to "what is happening in the worst department". Every page shares a header ("Employee Attrition Analysis, HR Workforce Analytics 2026"), a left-hand title panel, a row of four slicers and a consistent KPI-card and chart layout, so the pages read as one report.
+
+  |PAGE             |QUESTION ANSWERED               |VISUALS                           |SLICERS                            |
+  |-----------------|--------------------------------|----------------------------------|-----------------------------------|
+  | Workforce Overview | How big is attrition and where does it sit? | Cards: total workforce, retention rate, retained, attrition rate, attrited, average burnout, average monthly income. Charts: attrition by department, job role, job level, gender | Commute, work-life balance, burnout, overtime |
+  | Attrition Driver | Which wellbeing and workload factors drive exits? |Attrition by burnout, work-life balance and commute bands; line chart of burnout band by overtime band; four "highest attrition" callouts (burnout, commute, manager support, work-life balance) | Department, job role, gender, work mode |
+  | Attrition Hotspot |Which groups are worst affected? | Attrition by department, job level, job role and work mode; four "highest" callouts | Work-life balance, commute, burnout, overtime |
+  | Compensation and Career Growth | Do pay and progression matter? | Average income of leavers vs stayers by job level; attrition by salary hike, years since promotion and stock option level; callouts including the income gap | Department, work mode, job role, education |
+  | Customer Support Deep Dive | What is driving the highest-attrition department? | Customer Support employee count, attrition and retention counts and rates; attrition by burnout, overtime, work-life balance and commute; top-driver callout    | Work mode, gender, education, marital status |
+                                                      
