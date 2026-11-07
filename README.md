@@ -140,3 +140,39 @@ The EDA used one repeated query pattern: count employees, count attrition with C
   | Compensation and Career Growth | Do pay and progression matter? | Average income of leavers vs stayers by job level; attrition by salary hike, years since promotion and stock option level; callouts including the income gap | Department, work mode, job role, education |
   | Customer Support Deep Dive | What is driving the highest-attrition department? | Customer Support employee count, attrition and retention counts and rates; attrition by burnout, overtime, work-life balance and commute; top-driver callout    | Work mode, gender, education, marital status |
                                                       
+### Design and usability decisions
+- Fixed canvas and grid. Pages 2 to 5 use an identical 2,300 by 1,300 layout with the same slicer strip, card column and four-chart grid, which lets users compare pages without relearning the layout.
+- Text callouts as measures. "Highest X by attrition" cards give the answer in one glance and stay live under slicers.
+- Tooltips are designed to carry volume. Rate charts show attrition count and headcount in the tooltip, so a high percentage can be judged against the size of the group behind it (see Limitations for the headcount field to correct).
+- Logical ordering. Sort helper columns keep bands such as commute minutes and stock option level in natural order.
+- Navigation. Page-navigation buttons sit in the left panel of the overview page.
+
+  ## INSIGHTS
+  The data points to a workload-and-wellbeing problem more than a demographic or pay problem. Twelve findings, ranked by strength and usefulness:
+
+  |Insight                       |Explanation                                                                              |
+  |------------------------------|-----------------------------------------------------------------------------------------|
+  |Burnout is the strongest single warning sign.| Attrition is 54.0% in the High band against 4.6% in the Low band.        |
+  |Most leavers are in the middle, not the extreme.| The Moderate burnout band holds 745 of the 895 leavers (83%); the High band holds only 87, from 161 employees.|
+  |Weak manager support multiplies risk more than fourfold.| Attrition is 43.8% for Low support versus 10.1% for High.     |
+  |Poor work-life balance is as damaging as burnout.| Poor band 52.7% (74 staff) versus High band 9.8% (1,177).            |
+  |Disengaged employees almost always leave.| Low engagement 58.9% (56 staff), Moderate 23.7%, High 6.9%.                  |
+  |Customer Support is the hotspot.| Its attrition is 24.1% against 17.9% company-wide. It holds 12.7% of staff but 17.1% of all exits (153). It also has the lowest average income (5,527 versus 6,991 company-wide) and the second-highest average burnout (4.37).|
+  |Frontline support and sales-facing roles carry the highest rates.| Support Team Lead 26.0%, Support Specialist 25.2%, Content Strategist 23.9%, Account Executive 23.8%. The lowest are R&D Manager 10.0% and Software Engineer 12.3%.           |
+  |In Customer Support, the drivers hit harder.| Low manager support 68.8% (16 staff), High overtime 72.7% (11), High burnout 61.3% (31), Poor work-life balance 56.2% (16), commute of 61-80 minutes 47.4% (38).                                |
+  |Small raises and slow promotion push people out.| Low salary hike (up to 7.5%) 28.5% versus 11.4% for High. Staff 4 to 8 years since promotion leave at 26.6% versus 16.8% for the recently promoted.                                               |
+  |The overall pay gap hides a level effect.| Stayers earn 7,060 on average against 6,675 for leavers, a 5.5% gap.         |
+
+  ## RECOMMENDATIONS
+  The actions below follow the insights and are ordered by expected impact.
+
+-**Introduce an attrition early-warning flag:** Flag every employee whose burnout score is above 3.0 and whose manager support score is below 7.1. Give HR personnel a monthly list, grouped by department and manager, and ask them to hold a short stay conversation with each flagged employee.
+- **Monthly wellbeing pulse:** Survey burnout, engagement and work-life balance monthly on the existing 1 to 10 scales; the Moderate burnout band holds 83% of leavers (745 of 895), so act before staff reach the High band.
+- **Overtime guardrails:** Escalate anyone above 20 hours a week (52.4% attrition) and review workloads at 10 to 20 hours (28.7%), against 14.9% at 10 hours or fewer.
+- **Manager capability programme:** Train managers in one-to-ones and workload conversations, and add the support score to their reviews; attrition is 43.8% under Low support against 10.1% under High.
+- **Customer Support retention plan:** Add staffing buffers, a pay benchmark and a salary-hike floor; the department leaves at 24.1% against 17.9%, and reaching the company rate would avoid about 39 exits.
+- **Redesign frontline support roles:** Set caseload limits, shift rotation and a defined career path for Support Team Lead (26.0% attrition) and Support Specialist (25.2%).
+- **Protect work-life balance:** Offer flexible scheduling and no-meeting windows, starting with the Poor band (52.7% attrition, 74 staff).
+- **Promotion review at four years:** Review the 540 staff past four years without promotion, who leave at 26.6% to 33.3% against 16.8% for the recently promoted.
+- **Targeted equity or recognition pilot:** Pilot awards in Customer Support, where staff without stock options leave at 30.2% against 21% to 22% for those with options.
+  
